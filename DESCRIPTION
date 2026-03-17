@@ -1,0 +1,13 @@
+Package: regridR
+Title: Re-Grid Raster Layers
+Version: 0.1
+Authors@R: person(given = c("A.", "Marcia"), 
+                  family = "Barbosa", 
+                  role = c("cre", "aut"), 
+                  email = "ana.marcia.barbosa@gmail.com")
+Description: This package can take a set of (possibly non-equal-area, e.g. lon-lat) raster layers, and a regular equal-area vector polygon grid (such as the EEA reference grid), and transforms the former to the same extent, resolution (i.e. equal-area pixels) and coordinate reference system as the latter. It also includes a function to download variables from web links, after checking if they already have been (fully) downloaded.
+License: GPL (>=3)
+Imports: terra
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
