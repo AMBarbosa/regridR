@@ -11,7 +11,7 @@ regrid(layers, grid, fun = "mean", ...)
 
 \item{grid}{A polygon SpatVector defining the target grid. Must consist
 of square equal-area cells (e.g. the EEA reference grid), otherwise
-unexpected results may arise.}
+wrong results may arise.}
 
 \item{fun}{Character or function. Aggregation function passed to
 \code{terra::extract()} (e.g., \code{"mean"}, \code{"median"}, \code{"sum"}).}
@@ -41,12 +41,20 @@ This function:
 \dontrun{
 eea50 <- terra::vect("https://sdi.eea.europa.eu/datashare/s/jokLrYcEBFiJRyo/download?path=\%2FGPKG&files=EEA_50km_grid_v2024.gpkg")
 
-ctry <- geodata::gadm(country = "Portugal", level = 0, path = tempdir())
+ctry <- geodata::gadm(country = "Estonia", level = 0, path = tempdir())
 ctry_prj <- terra::project(ctry, eea50)
 grid <- terra::subset(eea50, ctry_prj)  # smaller object for faster computing
-layers <- geodata::worldclim_global(var = "bio", res = 5, path = tempdir())
+plot(grid)
 
-out <- regrid(layers = layers, grid = grid, fun = "mean")
+layers <- geodata::worldclim_global(var = "bio", res = 5, path = tempdir())
+plot(layers[[1:4]])
+plot(terra::crop(layers[[1:4]], ctry))
+
+out <- regrid(layers = layers, grid = grid, fun = "mean", touches = TRUE, na.rm = TRUE)
+plot(out[[1:4]])
+
+plot(out[[1]])
+plot(grid, add = TRUE)
 }
 
 }
