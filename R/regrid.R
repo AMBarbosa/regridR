@@ -30,11 +30,14 @@
 #' \dontrun{
 #' eea50 <- terra::vect("https://sdi.eea.europa.eu/datashare/s/jokLrYcEBFiJRyo/download?path=%2FGPKG&files=EEA_50km_grid_v2024.gpkg")
 #'
-#' ctry <- geodata::gadm(country = "Estonia", level = 0, path = tempdir())
+#' ctry <- geodata::gadm(country = "Portugal", level = 0, path = tempdir())
 #' ctry_prj <- terra::project(ctry, eea50)
-
+#'
+#' plot(ctry)
+#' plot(ctry_prj)
+#'
 #' grid <- terra::subset(eea50, ctry_prj)  # smaller object for faster computing
-#' plot(grid)
+#' plot(grid, lwd = 0.2, add = TRUE)
 #'
 #' layers <- geodata::worldclim_global(var = "bio", res = 5, path = tempdir())
 #' plot(layers[[1:4]])
@@ -44,15 +47,18 @@
 #' plot(out[[1:4]])
 #'
 #' plot(out[[1]])
-#' plot(grid, add = TRUE)
+#' plot(grid, lwd = 0.2, add = TRUE)
 #' }
 #'
 #' @importFrom terra project extract values ext rast rasterize nlyr
 #' @export
 
-regrid <- function(layers, grid, fun = "mean", ...) {
+regrid <- function(layers, grid, fun = "mean", verbosity = 1, ...) {
 
+  if (verbosity > 0) message("projecting 'grid' to 'layers'")
   grid_prj <- terra::project(grid, layers)
+
+  if (verbosity > 0) message("extracting 'layers' to projected 'grid'\n(can take a while for large grids...)")
   extr <- terra::extract(layers, grid_prj, fun = fun, ...)
   terra::values(grid) <- data.frame(terra::values(grid), extr)
 
@@ -66,9 +72,12 @@ regrid <- function(layers, grid, fun = "mean", ...) {
 
   out <- terra::rast(template, nlyrs = terra::nlyr(layers))
   names(out) <- names(layers)
+  if (verbosity == 1) message("rasterizing layers on projected grid")
   for (l in names(layers)) {
+    if (verbosity > 1) message("rasterizing ", l, " on projected grid")
     out[[l]] <- terra::rasterize(grid, template, field = l)
   }
 
+  if (verbosity > 0) message("finished!")
   out
 }
