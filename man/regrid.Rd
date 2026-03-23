@@ -8,7 +8,7 @@ regrid(
   layers,
   grid,
   fun = "mean",
-  densif = 5,
+  densif = 0,
   exactextract = FALSE,
   verbosity = 1,
   ...
@@ -26,7 +26,7 @@ the EEA reference grid), otherwise results will be incorrect.}
 \code{terra::extract()} (or to \code{exactextractr::exact_extract()} if
 exactextract = TRUE - see below).}
 
-\item{densif}{positive integer value (default 5) indicating the number of equally spaced vertices to add to each line segment of \code{grid}, to avoid the path changing too much when projecting (if \code{layers} have a different CRS).}
+\item{densif}{positive integer value (default 0) indicating the number of equal parts in which to divide each line segment of \code{grid}, in which case \code{terra::densify} is used to avoid the path changing too much when projecting (if \code{layers} have a different CRS). This normally makes a difference when grid cells are very large and at polar latitudes.}
 
 \item{exactextract}{logical (default FALSE) specifying whether the
 extraction of \code{layers} values to the polygon \code{grid} should be performed with
@@ -68,30 +68,44 @@ eea_url <- paste0("https://sdi.eea.europa.eu/datashare/s/jokLrYcEBFiJRyo/",
 
 eea50 <- terra::vect(eea_url)
 
+
 ctry <- geodata::gadm(country = "Portugal", level = 0, path = tempdir())
+
 ctry_prj <- terra::project(ctry, eea50)
 
+
 terra::plot(ctry)
+
 terra::plot(ctry_prj)
 
-grid <- terra::subset(eea50, ctry_prj)  # smaller object for faster example
+
+grid <- terra::subset(eea50, ctry_prj)  # smaller object for quicker example
 terra::plot(grid, lwd = 0.2, add = TRUE)
+
 
 layers <- geodata::worldclim_global(var = "bio", res = 5, path = tempdir())
 terra::plot(layers[[1:4]])
+
 terra::plot(terra::crop(layers[[1:4]], ctry))
 
-out <- regrid(layers = layers, grid = grid, fun = "mean", na.rm = TRUE,
-touches = TRUE)
+
+out <- regrid(layers = layers, grid = grid, fun = "mean",
+na.rm = TRUE, touches = TRUE)
+
 terra::plot(out[[1:4]])
 
+
 terra::plot(out[[1]])
+
 terra::plot(grid, lwd = 0.2, add = TRUE)
+
 
 out2 <- regrid(layers = layers, grid = grid, fun = "mean",
 exactextract = TRUE)
 
+
 terra::plot(out2[[1]])
+
 terra::plot(grid, lwd = 0.2, add = TRUE)
 }
 
