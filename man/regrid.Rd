@@ -4,57 +4,95 @@
 \alias{regrid}
 \title{Re-grid raster layer(s) onto an equal-area square-cell grid}
 \usage{
-regrid(layers, grid, fun = "mean", ...)
+regrid(
+  layers,
+  grid,
+  fun = "mean",
+  densif = 5,
+  exactextract = FALSE,
+  verbosity = 1,
+  ...
+)
 }
 \arguments{
-\item{layers}{A SpatRaster containing the input layer(s) to be re-gridded.}
+\item{layers}{SpatRaster (or an object that can be coerced to it)
+containing the input layer(s) to be re-gridded.}
 
-\item{grid}{A polygon SpatVector defining the target grid. Must consist
-of square equal-area cells (e.g. the EEA reference grid), otherwise
-wrong results may arise.}
+\item{grid}{SpatVector (or an object that can be coerced to it)
+defining the target grid. Must consist of square equal-area polygons (e.g.
+the EEA reference grid), otherwise results will be incorrect.}
 
-\item{fun}{Character or function. Aggregation function passed to
-\code{terra::extract()} (e.g., \code{"mean"}, \code{"median"}, \code{"sum"}).}
+\item{fun}{aggregation/summarizing function (default "mean") passed to
+\code{terra::extract()} (or to \code{exactextractr::exact_extract()} if
+exactextract = TRUE - see below).}
+
+\item{densif}{positive integer value (default 5) indicating the number of equally spaced vertices to add to each line segment of \code{grid}, to avoid the path changing too much when projecting (if \code{layers} have a different CRS).}
+
+\item{exactextract}{logical (default FALSE) specifying whether the
+extraction of \code{layers} values to the polygon \code{grid} should be performed with
+the 'exactextractr' package rather than the 'terra' package. Can be faster,
+but requires package 'exactextractr' (>= 0.10.1) to be installed.}
+
+\item{verbosity}{integer indicating the amount of progress messages to
+display. The default is 1, for an intermediate amount of messages. Currently
+meaningful values are integers from 0 to 2.}
 
 \item{...}{Additional arguments passed to \code{terra::extract()}.}
 }
 \value{
-A SpatRaster with the same number of layers as \code{layers},
-re-gridded to the resolution and extent of the target grid.
+The function returns a SpatRaster of the input \code{layers} re-gridded
+to match the input \code{grid}.
 }
 \description{
-This function extracts the values of a set of raster layers onto a regular
-equal-area vector polygon grid, then rasterizes the values onto a layer with
-the same extent, resolution and coordinate reference system as the input
-vector grid.
+This function extracts the values of a set of raster layers onto an
+equal-area square-cell vector polygon grid, then rasterizes the values onto
+a layer with the same extent, resolution and coordinate reference system as
+the input vector grid. It is useful for converting lon-lat variable layers
+into equal-area pixel grids (matching e.g. the EEA reference grid).
 }
 \details{
 This function:
 \itemize{
-\item Projects the input \code{grid} to overlay on the input \code{layers}.
-\item Extracts \code{layers} values onto the projected grid using \code{fun}.
-\item Builds a SpatRaster with the same dimensions as \code{grid}.
-\item Rasterizes each extracted layer onto this SpatRaster.
+\item Densifies the input vector \code{grid} (if densif > 0) by introducing additional vertices
+\item Projects the densified vector \code{grid} to properly overlay the input raster \code{layers}
+\item Extracts/summarizes \code{layers} values onto the projected \code{grid}, using
+the function specified in \code{fun}
+\item Makes a SpatRaster grid with the same CRS and dimensions (extent, cell size) as the input \code{grid}
+\item Rasterizes each extracted layer onto this SpatRaster grid
 }
 }
 \examples{
 \dontrun{
-eea50 <- terra::vect("https://sdi.eea.europa.eu/datashare/s/jokLrYcEBFiJRyo/download?path=\%2FGPKG&files=EEA_50km_grid_v2024.gpkg")
+eea_url <- paste0("https://sdi.eea.europa.eu/datashare/s/jokLrYcEBFiJRyo/",
+"download?path=\%2FGPKG&files=EEA_50km_grid_v2024.gpkg")
 
-ctry <- geodata::gadm(country = "Estonia", level = 0, path = tempdir())
+eea50 <- terra::vect(eea_url)
+
+ctry <- geodata::gadm(country = "Portugal", level = 0, path = tempdir())
 ctry_prj <- terra::project(ctry, eea50)
-grid <- terra::subset(eea50, ctry_prj)  # smaller object for faster computing
-plot(grid)
+
+terra::plot(ctry)
+terra::plot(ctry_prj)
+
+grid <- terra::subset(eea50, ctry_prj)  # smaller object for faster example
+terra::plot(grid, lwd = 0.2, add = TRUE)
 
 layers <- geodata::worldclim_global(var = "bio", res = 5, path = tempdir())
-plot(layers[[1:4]])
-plot(terra::crop(layers[[1:4]], ctry))
+terra::plot(layers[[1:4]])
+terra::plot(terra::crop(layers[[1:4]], ctry))
 
-out <- regrid(layers = layers, grid = grid, fun = "mean", touches = TRUE, na.rm = TRUE)
-plot(out[[1:4]])
+out <- regrid(layers = layers, grid = grid, fun = "mean", na.rm = TRUE,
+touches = TRUE)
+terra::plot(out[[1:4]])
 
-plot(out[[1]])
-plot(grid, add = TRUE)
+terra::plot(out[[1]])
+terra::plot(grid, lwd = 0.2, add = TRUE)
+
+out2 <- regrid(layers = layers, grid = grid, fun = "mean",
+exactextract = TRUE)
+
+terra::plot(out2[[1]])
+terra::plot(grid, lwd = 0.2, add = TRUE)
 }
 
 }

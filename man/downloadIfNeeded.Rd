@@ -36,9 +36,19 @@ For large files, consider increasing the download timeout, e.g.:
 \examples{
 \dontrun{
 links <- c(
-  "https://example.com/data/file1.zip",
-  "https://example.com/data/file2.zip"
+  paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
+  "1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif"),
+  paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/";
+  "1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif")
 )
+
+downloadIfNeeded(links, destdir = tempdir())
+
+
+links <- c(links,
+  paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
+  "1981-2010/bio/CHELSA_bio8_1981-2010_V.2.1.tif"))
+
 downloadIfNeeded(links, destdir = tempdir())
 }
 

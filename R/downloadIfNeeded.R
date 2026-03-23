@@ -27,13 +27,19 @@
 #' @examples
 #' \dontrun{
 #' links <- c(
-#'   "https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
-#'   "https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif"
+#'   paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
+#'   "1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif"),
+#'   paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/";
+#'   "1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif")
 #' )
+#'
 #' downloadIfNeeded(links, destdir = tempdir())
 #'
+#'
 #' links <- c(links,
-#'   "https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio8_1981-2010_V.2.1.tif")
+#'   paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
+#'   "1981-2010/bio/CHELSA_bio8_1981-2010_V.2.1.tif"))
+#'
 #' downloadIfNeeded(links, destdir = tempdir())
 #' }
 #'
