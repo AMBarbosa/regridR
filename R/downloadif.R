@@ -33,14 +33,14 @@
 #'   "1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif")
 #' )
 #'
-#' downloadIfNeeded(links, destdir = tempdir())
+#' downloadif(links, destdir = tempdir())
 #'
 #'
 #' links <- c(links,
 #'   paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
 #'   "1981-2010/bio/CHELSA_bio8_1981-2010_V.2.1.tif"))
 #'
-#' downloadIfNeeded(links, destdir = tempdir())
+#' downloadif(links, destdir = tempdir())
 #' }
 #'
 #' @importFrom httr HEAD
@@ -48,7 +48,7 @@
 
 #' @export
 
-downloadIfNeeded <- function(links, destdir) {
+downloadif <- function(links, destdir) {
 
   for (l in 1:length(links)) {
     link <- links[l]
