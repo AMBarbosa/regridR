@@ -26,21 +26,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' links <- c(
-#'   paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
-#'   "1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif"),
-#'   paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/";
-#'   "1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif")
-#' )
+#' dir.create("outputs/variables", recursive = TRUE)
 #'
-#' downloadif(links, destdir = tempdir())
+#' links <- linkbuild(c("bio1", "bio12"))
+#'
+#' downloadif(links, destdir = "outputs/variables")
 #'
 #'
-#' links <- c(links,
-#'   paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
-#'   "1981-2010/bio/CHELSA_bio8_1981-2010_V.2.1.tif"))
+#' links <- linkbuild(c("bio1", "bio12", "scd"))
 #'
-#' downloadif(links, destdir = tempdir())
+#' downloadif(links, destdir = "outputs/variables")
 #' }
 #'
 #' @importFrom httr HEAD
@@ -61,7 +56,7 @@ downloadif <- function(links, destdir) {
       # check if file is corrupted and needs new download
       file_size <- file.info(file_path)$size
       download_size <- as.numeric(httr::HEAD(link)$headers$`content-length`)  # https://stackoverflow.com/questions/63852146/how-to-determine-online-file-size-before-download-in-r
-      if (all.equal(file_size, download_size))  download <- FALSE
+      if (isTRUE(all.equal(file_size, download_size)))  download <- FALSE
     }  # end if file.exists
 
     if (isTRUE(download))

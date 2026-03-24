@@ -41,34 +41,41 @@
 #'
 #' @examples
 #' \dontrun{
+#'
+#' # download equal-area vector grid:
+#'
 #' eea_url <- paste0("https://sdi.eea.europa.eu/datashare/s/jokLrYcEBFiJRyo/",
 #' "download?path=%2FGPKG&files=EEA_50km_grid_v2024.gpkg")
 #'
 #' eea50 <- terra::vect(eea_url)
 #'
 #'
-#' ctry <- geodata::gadm(country = "Portugal", level = 0, path = tempdir())
+#' # subset grid to smaller area (for quicker example):
 #'
-#' ctry_prj <- terra::project(ctry, eea50)
+#' grid <- terra::subset(eea50, terra::ext(2.6e6, 3e6, 1.7e6, 2.4e6))  # smaller object for quicker example
 #'
-#'
-#' terra::plot(ctry)
-#'
-#' terra::plot(ctry_prj)
+#' terra::plot(grid)
 #'
 #'
-#' grid <- terra::subset(eea50, ctry_prj)  # smaller object for quicker example
-#' terra::plot(grid, lwd = 0.2, add = TRUE)
+#' # import raster layers:
+#'
+#' links <- linkbuild(c("bio1", "bio12"))  # get CHELSA climate links
+#'
+#' dir.create("outputs/variables", recursive = TRUE)
+#'
+#' options(timeout = 6000)  # allow longer download times
+#'
+#' downloadif(links, destdir = "outputs/variables")
+#'
+#' layers <- terra::rast(list.files("outputs/variables", full.names = TRUE))
+#'
+#' terra::plot(layers)
 #'
 #'
-#' layers <- geodata::worldclim_global(var = "bio", res = 5, path = tempdir())
-#' terra::plot(layers[[1:4]])
-#'
-#' terra::plot(terra::crop(layers[[1:4]], ctry))
-#'
+#' # re-grid layers:
 #'
 #' out <- regrid(layers = layers, grid = grid, fun = "mean",
-#' na.rm = TRUE, touches = TRUE)
+#' na.rm = TRUE)  # consider adding 'touches = TRUE'
 #'
 #' terra::plot(out[[1:4]])
 #'
@@ -117,19 +124,20 @@ regrid <- function(layers,
   }
 
   if (verbosity > 0) message("projecting 'grid' to overlay 'layers'")
-  grid_prj <- terra::project(grid_dens, layers)
+  if (densif > 0) grid_prj <- terra::project(grid_dens, layers)
+  else grid_prj <- terra::project(grid, layers)
 
   if (verbosity > 0) message("extracting 'layers' to projected 'grid' (can take a while for dense grids...)")
+  layers <- terra::crop(layers, grid_prj, snap = "out")  # avoids 'std::bad_alloc' memory problem when extracting
   if (exactextract) {
     extr <- exactextractr::exact_extract(layers, sf::st_as_sf(grid_prj), fun = fun)  # error if additional arguments...
     names(extr) <- gsub(paste0(fun, "."), "", names(extr))
   }
-  else extr <- terra::extract(layers, grid_prj, fun = fun, ...)
+  else extr <- terra::extract(layers, grid_prj, fun = fun, ID = FALSE, ...)
 
-  terra::values(grid) <- data.frame(terra::values(grid), extr)
+  terra::values(grid) <- data.frame(terra::values(grid), extr, check.names = FALSE)
 
   rst <- terra::rast(grid, resolution = dx)
-
   out <- terra::rast(rst, nlyrs = terra::nlyr(layers))
   names(out) <- names(layers)
   if (verbosity == 1) message("rasterizing input 'grid' with extracted 'layers' values")

@@ -35,21 +35,16 @@ For large files, consider increasing the download timeout, e.g.:
 }
 \examples{
 \dontrun{
-links <- c(
-  paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
-  "1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif"),
-  paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/";
-  "1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif")
-)
+dir.create("outputs/variables", recursive = TRUE)
 
-downloadif(links, destdir = tempdir())
+links <- linkbuild(c("bio1", "bio12"))
+
+downloadif(links, destdir = "outputs/variables")
 
 
-links <- c(links,
-  paste0("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/",
-  "1981-2010/bio/CHELSA_bio8_1981-2010_V.2.1.tif"))
+links <- linkbuild(c("bio1", "bio12", "scd"))
 
-downloadif(links, destdir = tempdir())
+downloadif(links, destdir = "outputs/variables")
 }
 
 }
