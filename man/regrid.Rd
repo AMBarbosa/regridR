@@ -23,7 +23,7 @@ defining the target grid. Must consist of square equal-area polygons (e.g.
 the EEA reference grid), otherwise results will be incorrect.}
 
 \item{fun}{aggregation/summarizing function (default "mean") passed to
-\code{terra::extract()} (or to \code{exactextractr::exact_extract()} if
+\code{terra::zonal()} (or to \code{exactextractr::exact_extract()} if
 exactextract = TRUE - see below).}
 
 \item{densif}{positive integer value (default 0) indicating the number of equal parts in which to divide each line segment of \code{grid}, in which case \code{terra::densify} is used to avoid the path changing too much when projecting (if \code{layers} have a different CRS). This normally makes a difference when grid cells are very large and at polar latitudes.}
@@ -81,7 +81,7 @@ terra::plot(grid)
 
 # import raster layers:
 
-links <- linkbuild(c("bio1", "bio12"))  # get CHELSA climate links
+links <- linkbuild(c("bio1", "scd"))  # get CHELSA climate links
 
 dir.create("outputs/variables", recursive = TRUE)
 
@@ -97,7 +97,7 @@ terra::plot(layers)
 # re-grid layers:
 
 out <- regrid(layers = layers, grid = grid, fun = "mean",
-na.rm = TRUE, touches = TRUE)
+na.rm = TRUE)  # consider adding 'touches = TRUE'
 
 terra::plot(out[[1:4]])
 
