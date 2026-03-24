@@ -1,21 +1,25 @@
 #' Re-grid raster layer(s) onto an equal-area square-cell grid
 #'
 #' @description
-#' This function extracts the values of a set of raster layers onto an
-#' equal-area square-cell vector polygon grid, then rasterizes the values onto
-#' a layer with the same extent, resolution and coordinate reference system as
-#' the input vector grid. It is useful for converting lon-lat variable layers
-#' into equal-area pixel grids (matching e.g. the EEA reference grid).
+#' This function extracts or summarizes (using zonal statistics) the values of
+#' a set of raster layers onto an equal-area square-cell vector polygon grid,
+#' then rasterizes the values onto a layer with the same extent, resolution and
+#' coordinate reference system as the input vector grid. It is useful for
+#' converting lon-lat variable layers into equal-area pixel grids (matching e.g. #' the EEA reference grid).
 #'
-#' @param layers SpatRaster (or an object that can be coerced to it)
+#' @param layers `SpatRaster` (or an object that can be coerced to it)
 #' containing the input layer(s) to be re-gridded.
-#' @param grid SpatVector (or an object that can be coerced to it)
-#' defining the target grid. Must consist of square equal-area polygons (e.g.
-#' the EEA reference grid), otherwise results will be incorrect.
+#' @param grid `SpatRaster`, `SpatVector` or `sf` (the latter will be coerced
+#' to `SpatVector`) defining the target grid. Must consist of square equal-area
+#' polygons (e.g. the EEA reference grid), otherwise results will be incorrect.
 #' @param fun aggregation/summarizing function (default "mean") passed to
-#' `terra::extract()` (or to `exactextractr::exact_extract()` if
+#' `terra::zonal()` (or to `exactextractr::exact_extract()` if
 #' exactextract = TRUE - see below).
-#' @param densif positive integer value (default 0) indicating the number of equal parts in which to divide each line segment of `grid`, in which case `terra::densify` is used to avoid the path changing too much when projecting (if `layers` have a different CRS). This normally makes a difference when grid cells are very large and at polar latitudes.
+#' @param densif positive integer value (default 0) indicating the number of
+#' equal parts in which to divide each line segment of `grid`, in which case
+#' `terra::densify` is used to avoid the path changing too much when projecting
+#' (if `layers` have a different CRS). This normally makes a difference when
+#' grid cells are very large and at polar latitudes.
 #' @param exactextract logical (default FALSE) specifying whether the
 #' extraction of `layers` values to the polygon `grid` should be performed with
 #' the 'exactextractr' package rather than the 'terra' package. Can be faster,
@@ -59,7 +63,7 @@
 #'
 #' # import raster layers:
 #'
-#' links <- linkbuild(c("bio1", "bio12"))  # get CHELSA climate links
+#' links <- linkbuild(c("bio1", "scd"))  # get CHELSA climate links
 #'
 #' dir.create("outputs/variables", recursive = TRUE)
 #'
@@ -94,7 +98,7 @@
 #' terra::plot(grid, lwd = 0.2, add = TRUE)
 #' }
 #'
-#' @importFrom terra densify ext extract nlyr project rast rasterize values vect
+#' @importFrom terra densify ext nlyr project rast rasterize values vect zonal
 #' @export
 
 regrid <- function(layers,
@@ -109,7 +113,7 @@ regrid <- function(layers,
     stop("exactextract=TRUE requires the 'exactextractr' package to be installed")
 
   if (!inherits(layers, "SpatRaster")) layers <- terra::rast(layers)
-  if (!inherits(grid, "SpatVector")) grid <- terra::vect(grid)
+  if (inherits(grid, "sf")) grid <- terra::vect(grid)
 
   ext1 <- terra::ext(grid[1, ])  # assumes all cells same size as 1st cell
   dx <- unname(ext1[2] - ext1[1])
@@ -133,7 +137,7 @@ regrid <- function(layers,
     extr <- exactextractr::exact_extract(layers, sf::st_as_sf(grid_prj), fun = fun)  # error if additional arguments...
     names(extr) <- gsub(paste0(fun, "."), "", names(extr))
   }
-  else extr <- terra::extract(layers, grid_prj, fun = fun, ID = FALSE, ...)
+  else extr <- terra::zonal(layers, grid_prj, fun = fun, ...)
 
   terra::values(grid) <- data.frame(terra::values(grid), extr, check.names = FALSE)
 
