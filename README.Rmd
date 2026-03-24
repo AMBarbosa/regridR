@@ -22,7 +22,7 @@ Most global-coverage raster layers containing variables used in species distribu
 
 If we want our raster variables on a grid of pixels that matches an equal-area grid within a given region (such as the EEA reference grid in Europe), we can use the `regrid()` function to convert raster layers into such equal-area grid. Below is a worked example. We start by downloading some variable layers from the CHELSA website, using the `downloadif()` function also included in the `regridR` package. This will download files if they haven't already been completely downloaded and saved in the destination folder:
 
-```{r}
+```{r, results='hide'}
 # LOAD REQUIRED PACKAGES ----
 
 library(regridR)
@@ -47,7 +47,7 @@ downloadif(links, destdir = "outputs/variables")
 # import variables from downloads folder:
 layers <- terra::rast(list.files("outputs/variables", full.names = TRUE))
 
-terra::plot(layers)
+terra::plot(layers, nc = 1)
 ```
 
 Next, we will import a vector polygon map of an equal-area grid recommended by the European Environment Agency (EEA):
@@ -70,7 +70,7 @@ terra::plot(layers[[1]], ext = terra::ext(15, 18, 56, 58))
 terra::plot(terra::project(eea50, layers), add = TRUE)
 ```
 
-So we use the `regridR::regrid()` function to get the climate layers on a raster grid that matches the EEA grid:
+So we use the `regrid()` function of the `regridR` package to get the climate layers on a raster grid that matches the EEA grid:
 
 ```{r, eval=FALSE}
 # RE-GRID LAYERS ----

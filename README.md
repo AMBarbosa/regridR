@@ -55,7 +55,7 @@ downloadif(links, destdir = "outputs/variables")
 # import variables from downloads folder:
 layers <- terra::rast(list.files("outputs/variables", full.names = TRUE))
 
-terra::plot(layers)
+terra::plot(layers, nc = 1)
 ```
 
 <img src="man/figures/README-unnamed-chunk-1-1.png" width="100%" />
@@ -86,8 +86,8 @@ terra::plot(terra::project(eea50, layers), add = TRUE)
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
-So we use the `regridR::regrid()` function to get the climate layers on
-a raster grid that matches the EEA grid:
+So we use the `regrid()` function of the `regridR` package to get the
+climate layers on a raster grid that matches the EEA grid:
 
 ``` r
 # RE-GRID LAYERS ----
