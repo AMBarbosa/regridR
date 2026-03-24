@@ -15,18 +15,22 @@ regrid(
 )
 }
 \arguments{
-\item{layers}{SpatRaster (or an object that can be coerced to it)
+\item{layers}{\code{SpatRaster} (or an object that can be coerced to it)
 containing the input layer(s) to be re-gridded.}
 
-\item{grid}{SpatVector (or an object that can be coerced to it)
-defining the target grid. Must consist of square equal-area polygons (e.g.
-the EEA reference grid), otherwise results will be incorrect.}
+\item{grid}{(\code{SpatRaster},) \code{SpatVector} or \code{sf} (the latter will be coerced
+to \code{SpatVector}) defining the target grid. Must consist of square equal-area
+polygons (e.g. the EEA reference grid), otherwise results will be incorrect.}
 
 \item{fun}{aggregation/summarizing function (default "mean") passed to
 \code{terra::zonal()} (or to \code{exactextractr::exact_extract()} if
 exactextract = TRUE - see below).}
 
-\item{densif}{positive integer value (default 0) indicating the number of equal parts in which to divide each line segment of \code{grid}, in which case \code{terra::densify} is used to avoid the path changing too much when projecting (if \code{layers} have a different CRS). This normally makes a difference when grid cells are very large and at polar latitudes.}
+\item{densif}{zero or positive integer value (default 0) indicating the
+number of equal parts in which to divide each line segment of \code{grid}, in
+which case \code{terra::densify} is used to avoid the path changing too much when
+projecting (if \code{layers} have a different CRS). This can make a difference
+when grid cells are large and near polar latitudes.}
 
 \item{exactextract}{logical (default FALSE) specifying whether the
 extraction of \code{layers} values to the polygon \code{grid} should be performed with
@@ -44,11 +48,11 @@ The function returns a SpatRaster of the input \code{layers} re-gridded
 to match the input \code{grid}.
 }
 \description{
-This function extracts the values of a set of raster layers onto an
-equal-area square-cell vector polygon grid, then rasterizes the values onto
-a layer with the same extent, resolution and coordinate reference system as
-the input vector grid. It is useful for converting lon-lat variable layers
-into equal-area pixel grids (matching e.g. the EEA reference grid).
+This function extracts or summarizes (using zonal statistics) the values of
+a set of raster layers onto an equal-area square-cell vector polygon grid,
+then rasterizes the values onto a layer with the same extent, resolution and
+coordinate reference system as the input vector grid. It is useful for
+converting lon-lat variable layers into equal-area pixel grids (matching e.g. #' the EEA reference grid).
 }
 \details{
 This function:
@@ -74,7 +78,7 @@ eea50 <- terra::vect(eea_url)
 
 # subset grid to smaller area (for quicker example):
 
-grid <- terra::subset(eea50, terra::ext(2.6e6, 3e6, 1.7e6, 2.4e6))  # smaller object for quicker example
+grid <- terra::subset(eea50, terra::ext(2.6e6, 3e6, 1.7e6, 2.4e6))
 
 terra::plot(grid)
 
@@ -97,7 +101,7 @@ terra::plot(layers)
 # re-grid layers:
 
 out <- regrid(layers = layers, grid = grid, fun = "mean",
-na.rm = TRUE)  # consider adding 'touches = TRUE'
+na.rm = TRUE, touches = TRUE)
 
 terra::plot(out[[1:4]])
 
@@ -106,6 +110,8 @@ terra::plot(out[[1]])
 
 terra::plot(grid, lwd = 0.2, add = TRUE)
 
+
+# re-grid faster if you have 'exactextractr' installed:
 
 out2 <- regrid(layers = layers, grid = grid, fun = "mean",
 exactextract = TRUE)
@@ -116,4 +122,7 @@ terra::plot(out2[[1]])
 terra::plot(grid, lwd = 0.2, add = TRUE)
 }
 
+}
+\author{
+A. Marcia Barbosa
 }

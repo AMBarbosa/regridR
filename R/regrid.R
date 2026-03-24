@@ -9,17 +9,17 @@
 #'
 #' @param layers `SpatRaster` (or an object that can be coerced to it)
 #' containing the input layer(s) to be re-gridded.
-#' @param grid `SpatRaster`, `SpatVector` or `sf` (the latter will be coerced
+#' @param grid (`SpatRaster`,) `SpatVector` or `sf` (the latter will be coerced
 #' to `SpatVector`) defining the target grid. Must consist of square equal-area
 #' polygons (e.g. the EEA reference grid), otherwise results will be incorrect.
 #' @param fun aggregation/summarizing function (default "mean") passed to
 #' `terra::zonal()` (or to `exactextractr::exact_extract()` if
 #' exactextract = TRUE - see below).
-#' @param densif positive integer value (default 0) indicating the number of
-#' equal parts in which to divide each line segment of `grid`, in which case
-#' `terra::densify` is used to avoid the path changing too much when projecting
-#' (if `layers` have a different CRS). This normally makes a difference when
-#' grid cells are very large and at polar latitudes.
+#' @param densif zero or positive integer value (default 0) indicating the
+#' number of equal parts in which to divide each line segment of `grid`, in
+#' which case `terra::densify` is used to avoid the path changing too much when
+#' projecting (if `layers` have a different CRS). This can make a difference
+#' when grid cells are large and near polar latitudes.
 #' @param exactextract logical (default FALSE) specifying whether the
 #' extraction of `layers` values to the polygon `grid` should be performed with
 #' the 'exactextractr' package rather than the 'terra' package. Can be faster,
@@ -56,7 +56,7 @@
 #'
 #' # subset grid to smaller area (for quicker example):
 #'
-#' grid <- terra::subset(eea50, terra::ext(2.6e6, 3e6, 1.7e6, 2.4e6))  # smaller object for quicker example
+#' grid <- terra::subset(eea50, terra::ext(2.6e6, 3e6, 1.7e6, 2.4e6))
 #'
 #' terra::plot(grid)
 #'
@@ -79,7 +79,7 @@
 #' # re-grid layers:
 #'
 #' out <- regrid(layers = layers, grid = grid, fun = "mean",
-#' na.rm = TRUE)  # consider adding 'touches = TRUE'
+#' na.rm = TRUE, touches = TRUE)
 #'
 #' terra::plot(out[[1:4]])
 #'
@@ -88,6 +88,8 @@
 #'
 #' terra::plot(grid, lwd = 0.2, add = TRUE)
 #'
+#'
+#' # re-grid faster if you have 'exactextractr' installed:
 #'
 #' out2 <- regrid(layers = layers, grid = grid, fun = "mean",
 #' exactextract = TRUE)
@@ -99,6 +101,7 @@
 #' }
 #'
 #' @importFrom terra densify ext nlyr project rast rasterize values vect zonal
+#' @author A. Marcia Barbosa
 #' @export
 
 regrid <- function(layers,
@@ -115,11 +118,13 @@ regrid <- function(layers,
   if (!inherits(layers, "SpatRaster")) layers <- terra::rast(layers)
   if (inherits(grid, "sf")) grid <- terra::vect(grid)
 
-  ext1 <- terra::ext(grid[1, ])  # assumes all cells same size as 1st cell
-  dx <- unname(ext1[2] - ext1[1])
-  dy <- unname(ext1[4] - ext1[3])
-  if (!isTRUE(all.equal(dx, dy))) {
-    warning("1st 'grid' cell not square! result may be incorrect")
+  if (inherits(grid, "SpatVector")) {
+    ext1 <- terra::ext(grid[1, ])  # assumes all cells same size as 1st cell
+    dx <- unname(ext1[2] - ext1[1])
+    dy <- unname(ext1[4] - ext1[3])
+    if (!isTRUE(all.equal(dx, dy))) {
+      warning("1st 'grid' cell not square! result may be incorrect")
+    }
   }
 
   if (densif > 0) {

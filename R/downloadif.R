@@ -40,7 +40,7 @@
 #'
 #' @importFrom httr HEAD
 #' @importFrom utils download.file
-
+#' @author A. Marcia Barbosa
 #' @export
 
 downloadif <- function(links, destdir) {

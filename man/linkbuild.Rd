@@ -36,3 +36,6 @@ linkbuild()
 linkbuild(c("bio1", "bio12", "scd"))
 
 }
+\author{
+A. Marcia Barbosa
+}
