@@ -29,7 +29,7 @@ and saved in the destination folder:
 library(regridR)
 
 library(terra)
-#> terra 1.9.1
+#> terra 1.9.13
 
 
 # DOWNLOAD SOME VARIABLES ----
@@ -79,7 +79,8 @@ We can project the vector grid to overlay a part of the climate layers,
 and see that they don’t align (and the pixels are not equal-area):
 
 ``` r
-terra::plot(layers[[1]], ext = terra::ext(15, 18, 56, 58))
+terra::plot(layers[[1]], ext = terra::ext(15, 18, 56, 58), 
+            maxcell = ncell(layers))
 
 terra::plot(terra::project(eea50, layers), add = TRUE)
 ```
