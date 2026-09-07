@@ -19,10 +19,10 @@ actually equal-area grid within a given region (such as the EEA
 reference grid in Europe), we can use the `regrid()` function of the
 `regridR` package to convert raster layers into such equal-area grid.
 Below is a worked example. We start by downloading some variable layers
-from the CHELSA website, using the `downloadif()` function also included
-in the `regridR` package. This will download files if they haven’t
-already been (completely) downloaded and saved in the destination
-folder:
+from the [CHELSA website](https://www.chelsa-climate.org/), using the
+`downloadif()` function also included in the `regridR` package. This
+will download files if they haven’t already been (completely) downloaded
+and saved in the destination folder:
 
 ``` r
 # LOAD REQUIRED PACKAGES ----
