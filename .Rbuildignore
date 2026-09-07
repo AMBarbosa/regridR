@@ -1,3 +1,5 @@
 ^regridR\.Rproj$
 ^\.Rproj\.user$
 outputs
+^\.positai$
+^\.claude$
