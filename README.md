@@ -15,14 +15,16 @@ resolution across temperate areas like Europe. Their actual sizes can be
 checked e.g. with the `terra::cellSize()` function.
 
 If we want our raster variables on a grid of pixels that matches an
-actually equal-area grid within a given region (such as the EEA
-reference grid in Europe), we can use the `regrid()` function of the
-`regridR` package to convert raster layers into such equal-area grid.
-Below is a worked example. We start by downloading some variable layers
-from the [CHELSA website](https://www.chelsa-climate.org/), using the
-`downloadif()` function also included in the `regridR` package. This
-will download files if they haven’t already been (completely) downloaded
-and saved in the destination folder:
+actually equal-area grid within a given region (such as the [EEA
+reference
+grid](https://www.eea.europa.eu/en/datahub/datahubitem-view/3c362237-daa4-45e2-8c16-aaadfb1a003b)
+in Europe), we can use the `regrid()` function of the `regridR` package
+to convert raster layers into such equal-area grid. Below is a worked
+example. We start by downloading some variable layers from the [CHELSA
+website](https://www.chelsa-climate.org/), using the `downloadif()`
+function also included in the `regridR` package. This will download
+files if they haven’t already been (completely) downloaded and saved in
+the destination folder:
 
 ``` r
 # LOAD REQUIRED PACKAGES ----
@@ -62,7 +64,8 @@ terra::plot(layers, nc = 1)
 <img src="man/figures/README-unnamed-chunk-1-1.png" alt="" width="100%" />
 
 Next, we will import a vector polygon map of a 10x10-km<sup>2</sup>
-equal-area grid recommended by the European Environment Agency (EEA):
+equal-area grid recommended by the European Environment Agency (EEA),
+using Belgium as an example:
 
 ``` r
 # IMPORT EQUAL-AREA VECTOR GRID ----
@@ -78,7 +81,7 @@ terra::plot(EEAgrid)
 We can project the vector grid to overlay a part of the climate layers
 and confirm that they don’t align (and the pixels are not equal-area, or
 square, or 1-km<sup>2</sup>), so simply aggregating the raster pixels
-into larger ones wouldn’t be a good option:
+into groups of 10x10 pixels wouldn’t be ideal:
 
 ``` r
 terra::plot(layers[[1]], maxcell = ncell(layers), ext = c(5, 5.4, 49.5, 49.7))
