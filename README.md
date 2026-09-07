@@ -75,10 +75,10 @@ terra::plot(EEAgrid)
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
 
-We can project the vector grid to overlay a part of the climate layers,
-and see that they don’t align (and the pixels are not equal-area or
-1-km<sup>2</sup>), so simply aggregating the raster pixels into larger
-ones isn’t a good option:
+We can project the vector grid to overlay a part of the climate layers
+and confirm that they don’t align (and the pixels are not equal-area, or
+square, or 1-km<sup>2</sup>), so simply aggregating the raster pixels
+into larger ones wouldn’t be a good option:
 
 ``` r
 terra::plot(layers[[1]], maxcell = ncell(layers), ext = c(5, 5.4, 49.5, 49.7))
