@@ -118,7 +118,7 @@ layers_regrid <- regridR::regrid(layers = layers, grid = EEAgrid,
 #> rasterizing input 'grid' with extracted 'layers' values
 #> finished!
 
-terra::plot(layers_regrid)
+terra::plot(layers_regrid, mar = c(1, 1, 2, 3.7))
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" alt="" width="100%" />

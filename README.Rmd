@@ -82,13 +82,13 @@ terra::plot(layers_regrid)
 
 By default, `regrid()` will use the `mean()` function to summarize the values of the pixels falling within each polygon grid cell, and the `terra::zonal()` function to do this summarizing. However, installing also the `exactextractr` package and **running `regrid()` with the argument `exactextract = TRUE`** can make the computation **considerably faster** for large grids, albeit with a slightly different algorithm:
 
-```{r, results='hide', fig.height=4}
+```{r, results='hide', fig.height=3.5}
 # RE-GRID LAYERS FASTER ----
 
 layers_regrid <- regridR::regrid(layers = layers, grid = EEAgrid, 
                                  exactextract = TRUE)
 
-terra::plot(layers_regrid)
+terra::plot(layers_regrid, mar = c(1, 1, 2, 3.7))
 ```
 
 We can visually check that the output (re-gridded) `layers`' pixels align with the input EEA `grid`:
