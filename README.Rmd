@@ -50,7 +50,7 @@ layers <- terra::rast(list.files("outputs/variables", full.names = TRUE))
 terra::plot(layers, nc = 1)
 ```
 
-Next, we will import a vector polygon map of a 10x10-km^2 equal-area grid recommended by the European Environment Agency (EEA):
+Next, we will import a vector polygon map of a 10x10-km^2^ equal-area grid recommended by the European Environment Agency (EEA):
 
 ```{r}
 # IMPORT EQUAL-AREA VECTOR GRID ----
@@ -61,7 +61,7 @@ EEAgrid <- terra::vect(system.file("extdata/eea10_belgium.gpkg",
 terra::plot(EEAgrid)
 ```
 
-We can project the vector grid to overlay a part of the climate layers, and see that they don't align (and the pixels are not equal-area or 1-km^2), so simply aggregating the raster pixels into larger ones isn't a good option:
+We can project the vector grid to overlay a part of the climate layers, and see that they don't align (and the pixels are not equal-area or 1-km^2^), so simply aggregating the raster pixels into larger ones isn't a good option:
 
 ```{r}
 terra::plot(layers[[1]], maxcell = ncell(layers), ext = c(5, 5.4, 49.5, 49.7))

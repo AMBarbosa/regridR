@@ -61,8 +61,8 @@ terra::plot(layers, nc = 1)
 
 <img src="man/figures/README-unnamed-chunk-1-1.png" alt="" width="100%" />
 
-Next, we will import a vector polygon map of a 10x10-km^2 equal-area
-grid recommended by the European Environment Agency (EEA):
+Next, we will import a vector polygon map of a 10x10-km<sup>2</sup>
+equal-area grid recommended by the European Environment Agency (EEA):
 
 ``` r
 # IMPORT EQUAL-AREA VECTOR GRID ----
@@ -77,8 +77,8 @@ terra::plot(EEAgrid)
 
 We can project the vector grid to overlay a part of the climate layers,
 and see that they don’t align (and the pixels are not equal-area or
-1-km^2), so simply aggregating the raster pixels into larger ones isn’t
-a good option:
+1-km<sup>2</sup>), so simply aggregating the raster pixels into larger
+ones isn’t a good option:
 
 ``` r
 terra::plot(layers[[1]], maxcell = ncell(layers), ext = c(5, 5.4, 49.5, 49.7))
