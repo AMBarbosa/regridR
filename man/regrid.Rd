@@ -23,19 +23,20 @@ to \code{SpatVector}) defining the target grid. Must consist of square equal-are
 polygons (e.g. the EEA reference grid), otherwise results will be incorrect.}
 
 \item{fun}{aggregation/summarizing function (default "mean") passed to
-\code{terra::zonal()} (or to \code{exactextractr::exact_extract()} if
-exactextract = TRUE - see below).}
+\code{terra::zonal()}, or to \code{exactextractr::exact_extract()} if
+exactextract = TRUE (see below).}
 
-\item{densif}{zero or positive integer value (default 0) indicating the
+\item{densif}{zero (default) or positive integer value indicating the
 number of equal parts in which to divide each line segment of \code{grid}, in
 which case \code{terra::densify} is used to avoid the path changing too much when
 projecting (if \code{layers} have a different CRS). This can make a difference
 when grid cells are large and near polar latitudes.}
 
 \item{exactextract}{logical (default FALSE) specifying whether the
-extraction of \code{layers} values to the polygon \code{grid} should be performed with
-the 'exactextractr' package rather than the 'terra' package. Can be faster,
-but requires package 'exactextractr' (>= 0.10.1) to be installed.}
+extraction of \code{layers} values to the polygon \code{grid} should be performed
+with the 'exactextractr' package rather than the default 'terra' package. Can be
+considerably faster, but requires package 'exactextractr' (>= 0.10.1) to be
+installed.}
 
 \item{verbosity}{integer indicating the amount of progress messages to
 display. The default is 1, for an intermediate amount of messages. Currently
@@ -57,12 +58,12 @@ converting lon-lat variable layers into equal-area pixel grids (matching e.g. #'
 \details{
 This function:
 \itemize{
-\item Densifies the input vector \code{grid} (if densif > 0) by introducing additional vertices
-\item Projects the densified vector \code{grid} to properly overlay the input raster \code{layers}
-\item Extracts/summarizes \code{layers} values onto the projected \code{grid}, using
+\item (if densif > 0) densifies the input vector \code{grid} by introducing additional vertices
+\item projects the (densified) vector \code{grid} to properly overlay the input raster \code{layers}
+\item extracts/summarizes \code{layers} values onto the projected \code{grid}, using
 the function specified in \code{fun}
-\item Makes a SpatRaster grid with the same CRS and dimensions (extent, cell size) as the input \code{grid}
-\item Rasterizes each extracted layer onto this SpatRaster grid
+\item makes a SpatRaster grid with the same CRS and dimensions (extent, cell size) as the input polygon \code{grid}
+\item rasterizes each extracted layer onto this SpatRaster grid
 }
 }
 \examples{

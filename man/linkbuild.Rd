@@ -15,7 +15,7 @@ linkbuild(
 \item{vars}{Character vector of variable identifiers. Defaults to
 \code{paste0("bio", 1:19)}.}
 
-\item{prefix}{Character string. URL prefix pointing to the CHELSA file
+\item{prefix}{Character string. URL prefix pointing to the file
 location. Defaults to
 \code{"https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_"}.}
 

@@ -7,7 +7,7 @@
 downloadif(links, destdir)
 }
 \arguments{
-\item{links}{Character vector of file download URLs.}
+\item{links}{Character vector of file download URLs, obtained e.g. with \code{\link{linkbuild}}.}
 
 \item{destdir}{Path to the directory where files should be saved.}
 }
@@ -30,7 +30,7 @@ from the \code{content-length} header of an HTTP HEAD request.
 \item Downloads the file only if it is missing or appears incomplete.
 }
 
-For large files, consider increasing the download timeout, e.g.:
+For large files, consider previously increasing the download timeout, e.g. by running
 \code{options(timeout = 6000)}.
 }
 \examples{
