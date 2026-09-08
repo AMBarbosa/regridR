@@ -6,11 +6,11 @@
 #'
 #' @param vars Character vector of variable identifiers. Defaults to
 #'   `paste0("bio", 1:19)`.
-#' @param prefix Character string. URL prefix pointing to the CHELSA file
-#'   location. Defaults to
+#' @param prefix Character string. URL prefix pointing to the file
+#'   location. Currently defaults to
 #'   `"https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_"`.
 #' @param suffix Character string appended after each variable name.
-#'   Defaults to `"_1981-2010_V.2.1.tif"`.
+#'   Currently defaults to `"_1981-2010_V.2.1.tif"`.
 #'
 #' @return A character vector of full URLs.
 #'

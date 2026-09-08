@@ -2,10 +2,11 @@
 #'
 #' @description
 #' This function extracts or summarizes (using zonal statistics) the values of
-#' a set of raster layers onto an equal-area square-cell vector polygon grid,
+#' a set of raster layers onto an equal-area square-cell vector polygon grid, and
 #' then rasterizes the values onto a layer with the same extent, resolution and
 #' coordinate reference system as the input vector grid. It is useful for
-#' converting lon-lat variable layers into equal-area pixel grids (matching e.g. #' the EEA reference grid).
+#' converting lon-lat variable layers into equal-area pixel grids (matching e.g.
+#' the EEA reference grid).
 #'
 #' @param layers `SpatRaster` (or an object that can be coerced to it)
 #' containing the input layer(s) to be re-gridded.
@@ -13,17 +14,18 @@
 #' to `SpatVector`) defining the target grid. Must consist of square equal-area
 #' polygons (e.g. the EEA reference grid), otherwise results will be incorrect.
 #' @param fun aggregation/summarizing function (default "mean") passed to
-#' `terra::zonal()` (or to `exactextractr::exact_extract()` if
-#' exactextract = TRUE - see below).
+#' `terra::zonal()`, or to `exactextractr::exact_extract()` if
+#' exactextract = TRUE (see below).
 #' @param densif zero or positive integer value (default 0) indicating the
 #' number of equal parts in which to divide each line segment of `grid`, in
-#' which case `terra::densify` is used to avoid the path changing too much when
+#' which case `terra::densify()` is used to avoid the path changing too much when
 #' projecting (if `layers` have a different CRS). This can make a difference
 #' when grid cells are large and near polar latitudes.
 #' @param exactextract logical (default FALSE) specifying whether the
 #' extraction of `layers` values to the polygon `grid` should be performed with
-#' the 'exactextractr' package rather than the 'terra' package. Can be faster,
-#' but requires package 'exactextractr' (>= 0.10.1) to be installed.
+#' the 'exactextractr' package rather than the default 'terra' package. Can be
+#' considerably faster, but requires package 'exactextractr' (>= 0.10.1) to be
+#' installed.
 #' @param verbosity integer indicating the amount of progress messages to
 #' display. The default is 1, for an intermediate amount of messages. Currently
 #' meaningful values are integers from 0 to 2.
@@ -32,12 +34,15 @@
 #' @details
 #' This function:
 #' \itemize{
-#'   \item Densifies the input vector `grid` (if densif > 0) by introducing additional vertices
-#'   \item Projects the densified vector `grid` to properly overlay the input raster `layers`
-#'   \item Extracts/summarizes `layers` values onto the projected `grid`, using
+#'   \item (if densif > 0) densifies the input vector `grid` by introducing
+#'   additional vertices
+#'   \item projects the densified vector `grid` to properly overlay the input
+#'   raster `layers`
+#'   \item extracts/summarizes `layers` values onto the projected `grid`, using
 #'   the function specified in `fun`
-#'   \item Makes a SpatRaster grid with the same CRS and dimensions (extent, cell size) as the input `grid`
-#'   \item Rasterizes each extracted layer onto this SpatRaster grid
+#'   \item makes a SpatRaster grid with the same CRS and dimensions (extent,
+#'   cell size) as the input `grid`
+#'   \item rasterizes each extracted layer onto this SpatRaster grid
 #' }
 #'
 #' @return The function returns a SpatRaster of the input `layers` re-gridded
@@ -153,9 +158,11 @@ regrid <- function(layers,
   rst <- terra::rast(grid, resolution = dx)  # assumes square cells
   out <- terra::rast(rst, nlyrs = terra::nlyr(layers))
   names(out) <- names(layers)
-  if (verbosity == 1) message("rasterizing input 'grid' with extracted 'layers' values")
+  if (verbosity == 1)
+    message("rasterizing input 'grid' with extracted 'layers' values")
   for (l in names(layers)) {
-    if (verbosity > 1) message("rasterizing input 'grid' with with extracted ", l)
+    if (verbosity > 1)
+      message("rasterizing input 'grid' with with extracted ", l)
     out[[l]] <- terra::rasterize(grid, rst, field = l)
   }
 

@@ -2,25 +2,25 @@
 #'
 #' @description
 #' Checks a set of file download links and downloads each file into a destination
-#' directory if it is not already present or if the existing file appears
+#' folder if it is not already present or if the existing file appears
 #' incomplete. File completeness is assessed by comparing the local file size
 #' with the remote file size obtained via an HTTP HEAD request.
 #'
 #' @param links Character vector of file download URLs.
-#' @param destdir Path to the directory where files should be saved.
+#' @param destdir Path to the folder (directory) where files should be saved.
 #'
 #' @details
 #' For each URL in `links`, this function:
 #' \itemize{
-#'   \item Determines the expected file name using `basename()`.
-#'   \item Checks whether the file already exists in `destdir`.
-#'   \item If it exists, compares its size to the remote file size obtained
+#'   \item determines the expected file name using `basename()`.
+#'   \item checks whether the file already exists in `destdir`.
+#'   \item if it exists, compares its size to the remote file size obtained
 #'         from the `content-length` header of an HTTP HEAD request.
-#'   \item Downloads the file only if it is missing or appears incomplete.
+#'   \item downloads the file if it is missing or appears incomplete in `destdir`.
 #' }
 #'
-#' For large files, consider increasing the download timeout, e.g.:
-#' \code{options(timeout = 6000)}.
+#' For large files, consider previously increasing the download timeout, e.g. by
+#' running \code{options(timeout = 6000)}.
 #'
 #' @return Invisibly returns `NULL`. Files are written to `destdir` as a side effect.
 #'

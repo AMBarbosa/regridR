@@ -7,31 +7,31 @@
 downloadif(links, destdir)
 }
 \arguments{
-\item{links}{Character vector of file download URLs, obtained e.g. with \code{\link{linkbuild}}.}
+\item{links}{Character vector of file download URLs.}
 
-\item{destdir}{Path to the directory where files should be saved.}
+\item{destdir}{Path to the folder (directory) where files should be saved.}
 }
 \value{
 Invisibly returns \code{NULL}. Files are written to \code{destdir} as a side effect.
 }
 \description{
 Checks a set of file download links and downloads each file into a destination
-directory if it is not already present or if the existing file appears
+folder if it is not already present or if the existing file appears
 incomplete. File completeness is assessed by comparing the local file size
 with the remote file size obtained via an HTTP HEAD request.
 }
 \details{
 For each URL in \code{links}, this function:
 \itemize{
-\item Determines the expected file name using \code{basename()}.
-\item Checks whether the file already exists in \code{destdir}.
-\item If it exists, compares its size to the remote file size obtained
+\item determines the expected file name using \code{basename()}.
+\item checks whether the file already exists in \code{destdir}.
+\item if it exists, compares its size to the remote file size obtained
 from the \code{content-length} header of an HTTP HEAD request.
-\item Downloads the file only if it is missing or appears incomplete.
+\item downloads the file if it is missing or appears incomplete in \code{destdir}.
 }
 
-For large files, consider previously increasing the download timeout, e.g. by running
-\code{options(timeout = 6000)}.
+For large files, consider previously increasing the download timeout, e.g. by
+running \code{options(timeout = 6000)}.
 }
 \examples{
 \dontrun{

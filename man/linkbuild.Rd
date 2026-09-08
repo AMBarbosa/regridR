@@ -16,11 +16,11 @@ linkbuild(
 \code{paste0("bio", 1:19)}.}
 
 \item{prefix}{Character string. URL prefix pointing to the file
-location. Defaults to
+location. Currently defaults to
 \code{"https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_"}.}
 
 \item{suffix}{Character string appended after each variable name.
-Defaults to \code{"_1981-2010_V.2.1.tif"}.}
+Currently defaults to \code{"_1981-2010_V.2.1.tif"}.}
 }
 \value{
 A character vector of full URLs.
