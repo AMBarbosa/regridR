@@ -5,22 +5,23 @@
 
 Most global-coverage raster layers containing variables used in species
 distribution models come in unprojected longitude-latitude coordinates,
-with a nominal spatial resolution like “*approximately 1x1 km2 at the
-equator*”. One problem is that lon-lat pixels are not equal-area, and
-they’re not really 1x1-km2 either (or whatever their nominal resolution
-is): Because the longitude meridians converge towards the poles, lon-lat
-pixels cover progressively smaller areas as we move away from the
-Equator, and they are already considerably smaller than their nominal
-resolution across temperate areas like Europe. Their actual sizes can be
-checked e.g. with the `terra::cellSize()` function.
+with a nominal spatial resolution like “*approximately 1x1
+km<sup>2</sup> at the equator*”. One problem is that lon-lat pixels are
+not equal-area, and they’re not 1x1-km<sup>2</sup> either (or whatever
+their nominal resolution is): as the longitude meridians converge
+towards the poles, lon-lat pixels cover progressively smaller areas as
+we move away from the Equator, and they are already considerably smaller
+than their nominal resolution across temperate regions like Europe.
+Their actual sizes can be checked e.g. with the `terra::cellSize()`
+function.
 
 If we want our raster variables on a grid of pixels that matches an
 actually equal-area grid within a given region (such as the [EEA
 reference
 grid](https://www.eea.europa.eu/en/datahub/datahubitem-view/3c362237-daa4-45e2-8c16-aaadfb1a003b)
-in Europe), we can use the `regrid()` function of the `regridR` package
-to convert raster layers into such equal-area grid. Below is a worked
-example. We start by downloading some variable layers from the [CHELSA
+in Europe), we can use the `regrid()` function of package `regridR` to
+convert raster layers into such equal-area grid. Below is a worked
+example. We start by downloading some climate layers from the [CHELSA
 website](https://www.chelsa-climate.org/), using the `downloadif()`
 function also included in the `regridR` package. This will download
 files if they haven’t already been (completely) downloaded and saved in
@@ -91,9 +92,8 @@ terra::plot(terra::project(EEAgrid, layers), add = TRUE)
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" alt="" width="100%" />
 
-So, we’ll use the `regrid()` function of the `regridR` package to get
-the climate layers on a raster grid whose pixels match the input EEA
-grid cells:
+So, we’ll use the `regrid()` function of `regridR` to get the climate
+layers on a raster grid whose pixels match the input polygon grid cells:
 
 ``` r
 # RE-GRID LAYERS ----
@@ -132,7 +132,7 @@ align with the input EEA `grid`:
 ``` r
 terra::plot(layers_regrid[[1]])
 
-terra::plot(EEAgrid, lwd = 0.2, add = TRUE)
+terra::plot(EEAgrid, lwd = 0.3, add = TRUE)
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" alt="" width="100%" />
