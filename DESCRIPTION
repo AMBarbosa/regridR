@@ -11,4 +11,4 @@ Imports: terra, httr, utils
 Suggests: exactextractr, sf
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+RoxygenNote: 8.0.0
