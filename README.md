@@ -39,7 +39,7 @@ library(terra)
 # DOWNLOAD SOME VARIABLES ----
 
 # get CHELSA climate links for a couple variables:
-links <- linkbuild(c("bio1", "scd"))
+links <- linkbuild(c("bio1", "bio12", "scd"))
 
 # create a folder for receiving downloads:
 dir.create("outputs/variables", recursive = TRUE)
@@ -54,15 +54,17 @@ downloadif(links, destdir = "outputs/variables")
 #> 1
 #> CHELSA_bio1_1981-2010_V.2.1.tif
 #> 2
+#> CHELSA_bio12_1981-2010_V.2.1.tif
+#> 3
 #> CHELSA_scd_1981-2010_V.2.1.tif
 
 # import variables from downloads folder:
 layers <- terra::rast(list.files("outputs/variables", full.names = TRUE))
 
-terra::plot(layers, nc = 1)
+terra::plot(layers)
 ```
 
-<img src="man/figures/README-unnamed-chunk-1-1.png" alt="" width="100%" />
+<img src="figures/README-unnamed-chunk-1-1.png" alt="" width="100%" />
 
 Next, we will import a vector polygon map of a 10x10-km<sup>2</sup>
 equal-area grid recommended by the European Environment Agency (EEA),
@@ -77,12 +79,12 @@ EEAgrid <- terra::vect(system.file("extdata/eea10_belgium.gpkg",
 terra::plot(EEAgrid)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
+<img src="figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
 
 We can project the vector grid to overlay a part of the climate layers
 and confirm that they don’t align (and the pixels are not equal-area, or
-square, or 1-km<sup>2</sup>), so simply aggregating the raster pixels
-into groups of 10x10 pixels wouldn’t be ideal:
+square, or 1-km<sup>2</sup>), so simply aggregating the raster into
+groups of 10x10 pixels wouldn’t be ideal:
 
 ``` r
 terra::plot(layers[[1]], maxcell = ncell(layers), ext = c(5, 5.4, 49.5, 49.7))
@@ -90,10 +92,10 @@ terra::plot(layers[[1]], maxcell = ncell(layers), ext = c(5, 5.4, 49.5, 49.7))
 terra::plot(terra::project(EEAgrid, layers), add = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" alt="" width="100%" />
+<img src="figures/README-unnamed-chunk-3-1.png" alt="" width="100%" />
 
 So, we’ll use the `regrid()` function of `regridR` to get the climate
-layers on a raster grid whose pixels match the input polygon grid cells:
+layers on a raster grid whose pixels match those polygon grid cells:
 
 ``` r
 # RE-GRID LAYERS ----
@@ -108,7 +110,7 @@ By default, `regrid()` will use the `mean()` function to summarize the
 values of the pixels falling within each polygon grid cell, and the
 `terra::zonal()` function to do this summarizing. However, installing
 also the `exactextractr` package and **running `regrid()` with the
-argument `exactextract = TRUE`** can make the computation **considerably
+argument `exactextract = TRUE`** can make the computation **much
 faster** for large grids, albeit with a slightly different algorithm:
 
 ``` r
@@ -121,10 +123,10 @@ layers_regrid <- regridR::regrid(layers = layers, grid = EEAgrid,
 #> rasterizing input 'grid' with extracted 'layers' values
 #> finished!
 
-terra::plot(layers_regrid, mar = c(1, 1, 2, 3.7))
+terra::plot(layers_regrid)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" alt="" width="100%" />
+<img src="figures/README-unnamed-chunk-5-1.png" alt="" width="100%" />
 
 We can visually check that the output (re-gridded) `layers`’ pixels
 align with the input EEA `grid`:
@@ -135,4 +137,9 @@ terra::plot(layers_regrid[[1]])
 terra::plot(EEAgrid, lwd = 0.3, add = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" alt="" width="100%" />
+<img src="figures/README-unnamed-chunk-6-1.png" alt="" width="100%" />
+
+So, you can use these re-gridded layers e.g. for modelling species
+distribution data using environmental rasters whose pixels match the
+equal-area squares recommended for our study region, such as the EEA
+reference grid in Europe.

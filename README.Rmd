@@ -8,7 +8,7 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
+  fig.path = "figures/README-",
   out.width = "100%",
   eval = TRUE,
   echo = TRUE,
@@ -33,7 +33,7 @@ library(terra)
 # DOWNLOAD SOME VARIABLES ----
 
 # get CHELSA climate links for a couple variables:
-links <- linkbuild(c("bio1", "scd"))
+links <- linkbuild(c("bio1", "bio12", "scd"))
 
 # create a folder for receiving downloads:
 dir.create("outputs/variables", recursive = TRUE)
@@ -47,7 +47,7 @@ downloadif(links, destdir = "outputs/variables")
 # import variables from downloads folder:
 layers <- terra::rast(list.files("outputs/variables", full.names = TRUE))
 
-terra::plot(layers, nc = 1)
+terra::plot(layers)
 ```
 
 Next, we will import a vector polygon map of a 10x10-km^2^ equal-area grid recommended by the European Environment Agency (EEA), using Belgium as an example:
@@ -61,7 +61,7 @@ EEAgrid <- terra::vect(system.file("extdata/eea10_belgium.gpkg",
 terra::plot(EEAgrid)
 ```
 
-We can project the vector grid to overlay a part of the climate layers and confirm that they don't align (and the pixels are not equal-area, or square, or 1-km^2^), so simply aggregating the raster pixels into groups of 10x10 pixels wouldn't be ideal:
+We can project the vector grid to overlay a part of the climate layers and confirm that they don't align (and the pixels are not equal-area, or square, or 1-km^2^), so simply aggregating the raster into groups of 10x10 pixels wouldn't be ideal:
 
 ```{r}
 terra::plot(layers[[1]], maxcell = ncell(layers), ext = c(5, 5.4, 49.5, 49.7))
@@ -69,7 +69,7 @@ terra::plot(layers[[1]], maxcell = ncell(layers), ext = c(5, 5.4, 49.5, 49.7))
 terra::plot(terra::project(EEAgrid, layers), add = TRUE)
 ```
 
-So, we'll use the `regrid()` function of `regridR` to get the climate layers on a raster grid whose pixels match the input polygon grid cells:
+So, we'll use the `regrid()` function of `regridR` to get the climate layers on a raster grid whose pixels match those polygon grid cells:
 
 ```{r, eval=FALSE}
 # RE-GRID LAYERS ----
@@ -80,7 +80,7 @@ layers_regrid <- regridR::regrid(layers = layers, grid = EEAgrid,
 terra::plot(layers_regrid)
 ```
 
-By default, `regrid()` will use the `mean()` function to summarize the values of the pixels falling within each polygon grid cell, and the `terra::zonal()` function to do this summarizing. However, installing also the `exactextractr` package and **running `regrid()` with the argument `exactextract = TRUE`** can make the computation **considerably faster** for large grids, albeit with a slightly different algorithm:
+By default, `regrid()` will use the `mean()` function to summarize the values of the pixels falling within each polygon grid cell, and the `terra::zonal()` function to do this summarizing. However, installing also the `exactextractr` package and **running `regrid()` with the argument `exactextract = TRUE`** can make the computation **much faster** for large grids, albeit with a slightly different algorithm:
 
 ```{r, results='hide', fig.height=3.5}
 # RE-GRID LAYERS FASTER ----
@@ -88,7 +88,7 @@ By default, `regrid()` will use the `mean()` function to summarize the values of
 layers_regrid <- regridR::regrid(layers = layers, grid = EEAgrid, 
                                  exactextract = TRUE)
 
-terra::plot(layers_regrid, mar = c(1, 1, 2, 3.7))
+terra::plot(layers_regrid)
 ```
 
 We can visually check that the output (re-gridded) `layers`' pixels align with the input EEA `grid`:
@@ -99,3 +99,4 @@ terra::plot(layers_regrid[[1]])
 terra::plot(EEAgrid, lwd = 0.3, add = TRUE)
 ```
 
+So, you can use these re-gridded layers e.g. for modelling species distribution data using environmental rasters whose pixels match the equal-area squares recommended for our study region, such as the EEA reference grid in Europe.
