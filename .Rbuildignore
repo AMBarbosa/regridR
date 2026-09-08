@@ -3,3 +3,11 @@
 outputs
 ^\.positai$
 ^\.claude$
+
+(?i)^EEA
+(?i)^wcbio
+\.zip$
+\.pdf$
+^(?!R/).*\.R$
+maps
+figures
