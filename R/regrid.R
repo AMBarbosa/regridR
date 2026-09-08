@@ -139,14 +139,18 @@ regrid <- function(layers,
   if (verbosity > 0) message("extracting 'layers' to projected 'grid' (can take a while for dense grids...)")
   layers <- terra::crop(layers, grid_prj, snap = "out")  # avoids 'std::bad_alloc' memory problem when extracting
   if (exactextract) {
-    extr <- exactextractr::exact_extract(layers, sf::st_as_sf(grid_prj), fun = fun)  # error if additional arguments...
-    names(extr) <- gsub(paste0(fun, "."), "", names(extr))
+    extr <- data.frame(exactextractr::exact_extract(layers,
+                                                    sf::st_as_sf(grid_prj),
+                                                    fun = fun))
+                                                    # error if additional arguments...
+    # names(extr) <- gsub(paste0(fun, "."), "", names(extr))
+    names(extr) <- names(layers)
   }
   else extr <- terra::zonal(layers, grid_prj, fun = fun, ...)
 
   terra::values(grid) <- data.frame(terra::values(grid), extr, check.names = FALSE)
 
-  rst <- terra::rast(grid, resolution = dx)
+  rst <- terra::rast(grid, resolution = dx)  # assumes square cells
   out <- terra::rast(rst, nlyrs = terra::nlyr(layers))
   names(out) <- names(layers)
   if (verbosity == 1) message("rasterizing input 'grid' with extracted 'layers' values")
