@@ -1,6 +1,6 @@
 Package: regridR
 Title: Re-Grid Raster Layers
-Version: 0.1
+Version: 0.2
 Authors@R: person(given = c("A.", "Marcia"), 
                   family = "Barbosa", 
                   role = c("cre", "aut"), 
