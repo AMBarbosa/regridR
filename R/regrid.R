@@ -1,18 +1,19 @@
-#' Re-grid raster layer(s) onto an equal-area square-cell grid
+#' Re-grid raster layer(s) onto an equal-area rectangular grid
 #'
 #' @description
 #' This function extracts or summarizes (using zonal statistics) the values of
-#' a set of raster layers onto an equal-area square-cell vector polygon grid, and
-#' then rasterizes the values onto a layer with the same extent, resolution and
-#' coordinate reference system as the input vector grid. It is useful for
-#' converting lon-lat variable layers into equal-area pixel grids (matching e.g.
-#' the EEA reference grid).
+#' a set of raster layers onto a vector polygon grid of equal-area squares or
+#' rectangles, and then rasterizes the values onto a layer with the same extent,
+#' resolution and coordinate reference system as the input vector grid. It is
+#' useful for converting lon-lat environmental layers into equal-area pixel grids
+#' (matching e.g. the EEA reference grid).
 #'
 #' @param layers `SpatRaster` (or an object that can be coerced to it)
 #' containing the input layer(s) to be re-gridded.
 #' @param grid (`SpatRaster`,) `SpatVector` or `sf` (the latter will be coerced
-#' to `SpatVector`) defining the target grid. Must consist of square equal-area
-#' polygons (e.g. the EEA reference grid), otherwise results will be incorrect.
+#' to `SpatVector`) of polygons defining the target grid. All cells must be
+#' square or rectangular and have the same area (e.g. the EEA reference grid),
+#' otherwise results will be incorrect.
 #' @param fun aggregation/summarizing function (default "mean") passed to
 #' `terra::zonal()`, or to `exactextractr::exact_extract()` if
 #' exactextract = TRUE (see below).
@@ -21,11 +22,10 @@
 #' which case `terra::densify()` is used to avoid the path changing too much when
 #' projecting (if `layers` have a different CRS). This can make a difference
 #' when grid cells are large and near polar latitudes.
-#' @param exactextract logical (default FALSE) specifying whether the
-#' extraction of `layers` values to the polygon `grid` should be performed with
-#' the 'exactextractr' package rather than the default 'terra' package. Can be
-#' considerably faster, but requires package 'exactextractr' (>= 0.10.1) to be
-#' installed.
+#' @param exactextract logical value specifying whether the extraction of `layers`
+#' values to the polygon `grid` should be performed with the (considerably faster)
+#' 'exactextractr' package, rather than the imported 'terra' package. The default
+#' is TRUE if 'exactextractr' version >= 0.10.1 is installed, and FALSE otherwise.
 #' @param verbosity integer indicating the amount of progress messages to
 #' display. The default is 1, for an intermediate amount of messages. Currently
 #' meaningful values are integers from 0 to 2.
@@ -82,6 +82,7 @@
 #'
 #'
 #' # re-grid layers:
+#' # (will be much faster if you have package 'exactextractr' installed)
 #'
 #' out <- regrid(layers = layers, grid = grid, fun = "mean",
 #' na.rm = TRUE, touches = TRUE)
@@ -92,20 +93,10 @@
 #' terra::plot(out[[1]])
 #'
 #' terra::plot(grid, lwd = 0.2, add = TRUE)
-#'
-#'
-#' # re-grid faster if you have 'exactextractr' installed:
-#'
-#' out2 <- regrid(layers = layers, grid = grid, fun = "mean",
-#' exactextract = TRUE)
-#'
-#'
-#' terra::plot(out2[[1]])
-#'
-#' terra::plot(grid, lwd = 0.2, add = TRUE)
 #' }
 #'
 #' @importFrom terra densify ext nlyr project rast rasterize values vect zonal
+#' @importFrom utils packageVersion
 #' @author A. Marcia Barbosa
 #' @export
 
@@ -113,12 +104,13 @@ regrid <- function(layers,
                    grid,
                    fun = "mean",
                    densif = 0,
-                   exactextract = FALSE,
+                   exactextract = requireNamespace("exactextractr") &&
+                     packageVersion("exactextractr") >= "0.10.1",
                    verbosity = 1,
                    ...) {
 
-  if (exactextract && !requireNamespace("exactextractr", quietly = TRUE))
-    stop("exactextract=TRUE requires the 'exactextractr' package to be installed")
+  if (exactextract && !("exactextractr" %in% .packages(all.available = TRUE) || packageVersion("exactextractr") < "0.10.1"))
+    stop("exactextract=TRUE requires the 'exactextractr' package (version >= 0.10.1) to be installed")
 
   if (!inherits(layers, "SpatRaster")) layers <- terra::rast(layers)
   if (inherits(grid, "sf")) grid <- terra::vect(grid)
@@ -127,9 +119,6 @@ regrid <- function(layers,
     ext1 <- terra::ext(grid[1, ])  # assumes all cells same size as 1st cell
     dx <- unname(ext1[2] - ext1[1])
     dy <- unname(ext1[4] - ext1[3])
-    if (!isTRUE(all.equal(dx, dy))) {
-      warning("1st 'grid' cell not square! result may be incorrect")
-    }
   }
 
   if (densif > 0) {
@@ -153,9 +142,11 @@ regrid <- function(layers,
   }
   else extr <- terra::zonal(layers, grid_prj, fun = fun, ...)
 
+  if (ncol(terra::values(grid)) == 0)
+    terra::values(grid) <- data.frame(rownum = 1:nrow(grid))
   terra::values(grid) <- data.frame(terra::values(grid), extr, check.names = FALSE)
 
-  rst <- terra::rast(grid, resolution = dx)  # assumes square cells
+  rst <- terra::rast(grid, resolution = c(dx, dy))
   out <- terra::rast(rst, nlyrs = terra::nlyr(layers))
   names(out) <- names(layers)
   if (verbosity == 1)

@@ -2,14 +2,15 @@
 % Please edit documentation in R/regrid.R
 \name{regrid}
 \alias{regrid}
-\title{Re-grid raster layer(s) onto an equal-area square-cell grid}
+\title{Re-grid raster layer(s) onto an equal-area rectangular grid}
 \usage{
 regrid(
   layers,
   grid,
   fun = "mean",
   densif = 0,
-  exactextract = FALSE,
+  exactextract = requireNamespace("exactextractr") && packageVersion("exactextractr") >=
+    "0.10.1",
   verbosity = 1,
   ...
 )
@@ -19,8 +20,9 @@ regrid(
 containing the input layer(s) to be re-gridded.}
 
 \item{grid}{(\code{SpatRaster},) \code{SpatVector} or \code{sf} (the latter will be coerced
-to \code{SpatVector}) defining the target grid. Must consist of square equal-area
-polygons (e.g. the EEA reference grid), otherwise results will be incorrect.}
+to \code{SpatVector}) of polygons defining the target grid. All cells must be
+square or rectangular and have the same area (e.g. the EEA reference grid),
+otherwise results will be incorrect.}
 
 \item{fun}{aggregation/summarizing function (default "mean") passed to
 \code{terra::zonal()}, or to \code{exactextractr::exact_extract()} if
@@ -32,11 +34,10 @@ which case \code{terra::densify()} is used to avoid the path changing too much w
 projecting (if \code{layers} have a different CRS). This can make a difference
 when grid cells are large and near polar latitudes.}
 
-\item{exactextract}{logical (default FALSE) specifying whether the
-extraction of \code{layers} values to the polygon \code{grid} should be performed with
-the 'exactextractr' package rather than the default 'terra' package. Can be
-considerably faster, but requires package 'exactextractr' (>= 0.10.1) to be
-installed.}
+\item{exactextract}{logical value specifying whether the extraction of \code{layers}
+values to the polygon \code{grid} should be performed with the (considerably faster)
+'exactextractr' package, rather than the imported 'terra' package. The default
+is TRUE if 'exactextractr' version >= 0.10.1 is installed, and FALSE otherwise.}
 
 \item{verbosity}{integer indicating the amount of progress messages to
 display. The default is 1, for an intermediate amount of messages. Currently
@@ -50,11 +51,11 @@ to match the input \code{grid}.
 }
 \description{
 This function extracts or summarizes (using zonal statistics) the values of
-a set of raster layers onto an equal-area square-cell vector polygon grid, and
-then rasterizes the values onto a layer with the same extent, resolution and
-coordinate reference system as the input vector grid. It is useful for
-converting lon-lat variable layers into equal-area pixel grids (matching e.g.
-the EEA reference grid).
+a set of raster layers onto a vector polygon grid of equal-area squares or
+rectangles, and then rasterizes the values onto a layer with the same extent,
+resolution and coordinate reference system as the input vector grid. It is
+useful for converting lon-lat environmental layers into equal-area pixel grids
+(matching e.g. the EEA reference grid).
 }
 \details{
 This function:
@@ -104,6 +105,7 @@ terra::plot(layers)
 
 
 # re-grid layers:
+# (will be much faster if you have package 'exactextractr' installed)
 
 out <- regrid(layers = layers, grid = grid, fun = "mean",
 na.rm = TRUE, touches = TRUE)
@@ -112,17 +114,6 @@ terra::plot(out[[1:4]])
 
 
 terra::plot(out[[1]])
-
-terra::plot(grid, lwd = 0.2, add = TRUE)
-
-
-# re-grid faster if you have 'exactextractr' installed:
-
-out2 <- regrid(layers = layers, grid = grid, fun = "mean",
-exactextract = TRUE)
-
-
-terra::plot(out2[[1]])
 
 terra::plot(grid, lwd = 0.2, add = TRUE)
 }

@@ -11,3 +11,6 @@ outputs
 ^(?!R/).*\.R$
 maps
 figures
+PLANNED_IMPROVEMENTS.txt
+README.Rmd
+manuscript

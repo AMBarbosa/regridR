@@ -4,16 +4,17 @@
 # regridR: re-grid raster layers
 
 Most global-coverage raster layers containing variables used in species
-distribution models come in unprojected longitude-latitude coordinates,
-with a nominal spatial resolution like “*approximately 1x1
-km<sup>2</sup> at the equator*”. One problem is that lon-lat pixels are
-not equal-area, and they’re not 1x1-km<sup>2</sup> either (or whatever
-their nominal resolution is): as the longitude meridians converge
-towards the poles, lon-lat pixels cover progressively smaller areas as
-we move away from the Equator, and they are already considerably smaller
-than their nominal resolution across temperate regions like Europe.
-Their actual sizes can be checked e.g. with the `terra::cellSize()`
-function.
+distribution models (e.g. [WorldClim](https://www.worldclim.org/),
+[CHELSA](https://www.chelsa-climate.org/)) come in unprojected
+longitude-latitude coordinates, with a nominal spatial resolution like
+“*approximately 1x1 km<sup>2</sup> at the equator*”. One problem is that
+longitude-latitude pixels are not equal-area, and they’re not
+1x1-km<sup>2</sup> either (or whatever their nominal resolution is): as
+the longitude meridians converge towards the North and the South Pole,
+longitude-latitude pixels cover progressively smaller areas as we move
+away from the Equator, and they are already considerably smaller than
+their nominal resolution across temperate regions like Europe. Their
+actual sizes can be checked e.g. with the `terra::cellSize()` function.
 
 If we want our raster variables on a grid of pixels that matches an
 actually equal-area grid within a given region (such as the [EEA
@@ -139,7 +140,7 @@ terra::plot(EEAgrid, lwd = 0.3, add = TRUE)
 
 <img src="figures/README-unnamed-chunk-6-1.png" alt="" width="100%" />
 
-So, you can use these re-gridded layers e.g. for modelling species
+So, you can use the re-gridded layers e.g. for modelling species
 distribution data using environmental rasters whose pixels match the
-equal-area squares recommended for our study region, such as the EEA
+equal-area squares recommended for your study region, such as the EEA
 reference grid in Europe.
