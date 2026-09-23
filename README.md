@@ -31,16 +31,18 @@ the destination folder:
 ``` r
 # LOAD REQUIRED PACKAGES ----
 
-library(regridR)
+# install.packages("terra")
+# remotes::install_github("AMBarbosa/regridR")
 
+library(regridR)
 library(terra)
-#> terra 1.9.46
+#> terra 1.9.50
 
 
 # DOWNLOAD SOME VARIABLES ----
 
 # get CHELSA climate links for a couple variables:
-links <- linkbuild(c("bio1", "bio12", "scd"))
+links <- regridR::linkbuild(c("bio1", "bio12", "scd"))
 
 # create a folder for receiving downloads:
 dir.create("outputs/variables", recursive = TRUE)
@@ -51,7 +53,7 @@ dir.create("outputs/variables", recursive = TRUE)
 options(timeout = 6000)
 
 # download variables if not already there:
-downloadif(links, destdir = "outputs/variables")
+regridR::downloadif(links, destdir = "outputs/variables")
 #> 1
 #> CHELSA_bio1_1981-2010_V.2.1.tif
 #> 2
