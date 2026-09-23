@@ -25,15 +25,17 @@ If we want our raster variables on a grid of pixels that matches an actually equ
 ```{r, results='hide'}
 # LOAD REQUIRED PACKAGES ----
 
-library(regridR)
+# install.packages("terra")
+# remotes::install_github("AMBarbosa/regridR")
 
+library(regridR)
 library(terra)
 
 
 # DOWNLOAD SOME VARIABLES ----
 
 # get CHELSA climate links for a couple variables:
-links <- linkbuild(c("bio1", "bio12", "scd"))
+links <- regridR::linkbuild(c("bio1", "bio12", "scd"))
 
 # create a folder for receiving downloads:
 dir.create("outputs/variables", recursive = TRUE)
@@ -42,7 +44,7 @@ dir.create("outputs/variables", recursive = TRUE)
 options(timeout = 6000)
 
 # download variables if not already there:
-downloadif(links, destdir = "outputs/variables")
+regridR::downloadif(links, destdir = "outputs/variables")
 
 # import variables from downloads folder:
 layers <- terra::rast(list.files("outputs/variables", full.names = TRUE))
